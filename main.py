@@ -1,8 +1,9 @@
 from graphene import Schema, ObjectType, List, Field, String, Int, Float
 from fastapi import FastAPI
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler, make_playground_handler
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, Integer, String as sqString, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.ext.declarative import declarative_base
 
 DATABASE_USER = "postgres"
 DATABASE_PASSWORD = "admin"
@@ -13,7 +14,32 @@ DATABASE_NAME = "fastapi_graphene"
 DB_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 engine = create_engine(DB_URL, pool_size=50, max_overflow=5)
 conn = engine.connect()
-#SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+class Employer(Base):
+    __tablename__="employers"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(sqString)
+    contact_email = Column(sqString)
+    industry = Column(sqString)
+    jobs = relationship("Job", back_populates="employer")
+
+class Job(Base):
+    __tablename__="jobs"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(sqString)
+    description = Column(sqString)
+    employer_id = Column(Integer, ForeignKey("employers.id"))
+    employer = relationship("Employer", back_populates="jobs")
+
+Base.metadata.create_all(engine)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
 
 employers_data = [
     {"id": 1, "name": "MetaTechA", "contact_email": "contact@company-a.com", "industry": "Tech"},
@@ -26,6 +52,25 @@ jobs_data = [
     {"id": 3, "title": "Accountant", "description": "Manage financial records", "employer_id": 2},
     {"id": 4, "title": "Manager", "description": "Manage people who manage records", "employer_id": 2},
 ]
+
+
+
+def prepare_database():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    session = SessionLocal()
+
+    for employer in employers_data:
+        emp = Employer(**employer)
+        session.add(emp)
+
+    for job in jobs_data:
+        jb = Job(**job)
+        session.add(jb)  
+
+    session.commit()
+    session.close()
 
 class EmployerObject(ObjectType):
     id = Int()
@@ -66,10 +111,9 @@ schema = Schema(query=Query)
 
 app = FastAPI()
 
-# app.mount("/graphql", GraphQLApp(
-#     schema=schema,
-#     on_get=make_graphiql_handler()
-# ))
+@app.on_event("startup")
+def startup_event():
+    prepare_database()
 
 app.mount("/graphql", GraphQLApp(
     schema=schema,
