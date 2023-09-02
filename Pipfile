@@ -5,6 +5,13 @@ name = "pypi"
 
 [packages]
 graphene = "*"
+fastapi = "*"
+starlette = "*"
+starlette-graphene3 = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+psycopg = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
