@@ -1,11 +1,11 @@
 from sqlalchemy import create_engine, Column, Integer, String as sqString, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base
+from app.db.database import Base
 
 class Employer(Base):
     __tablename__="employers"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(sqString)
     contact_email = Column(sqString)
     industry = Column(sqString)
@@ -14,7 +14,7 @@ class Employer(Base):
 class Job(Base):
     __tablename__="jobs"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(sqString)
     description = Column(sqString)
     employer_id = Column(Integer, ForeignKey("employers.id"))
