@@ -1,6 +1,5 @@
-from graphene import ObjectType, List
+from graphene import ObjectType, List, Field, Int
 from app.gql.types import JobObject, EmployerObject
-from app.db.data import jobs_data, employers_data
 from app.db.database import SessionLocal
 from app.db.models import Employer, Job
 from sqlalchemy.orm import joinedload
@@ -9,6 +8,7 @@ from sqlalchemy.orm import joinedload
 class Query(ObjectType):
     jobs = List(JobObject)
     employers = List(EmployerObject)
+    job = Field(JobObject, id=Int())
 
     @staticmethod
     def resolve_jobs(root, info):
@@ -25,3 +25,10 @@ class Query(ObjectType):
         # employers = session.query(Employer).options(joinedload(Employer.jobs)).all()
         session.close()
         return employers
+    
+    @staticmethod
+    def resolve_job(root, info, id: int):
+        session = SessionLocal()
+        jb = session.query(Job).filter(Job.id == id).first()
+        session.close()
+        return jb
