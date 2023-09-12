@@ -32,3 +32,5 @@ class Query(ObjectType):
         jb = session.query(Job).filter(Job.id == id).first()
         session.close()
         return jb
+
+
