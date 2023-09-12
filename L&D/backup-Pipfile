@@ -11,7 +11,7 @@ starlette-graphene3 = "*"
 uvicorn = "*"
 sqlalchemy = "*"
 psycopg = "*"
-psycopg2-binary = "*"
+psycopg2 = "*"
 
 [dev-packages]
 

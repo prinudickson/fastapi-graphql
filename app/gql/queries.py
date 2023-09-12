@@ -13,16 +13,15 @@ class Query(ObjectType):
     @staticmethod
     def resolve_jobs(root, info):
         session = SessionLocal()
-        jobs = session.query(Job).options(joinedload(Job.employer)).all()
+        #jobs = session.query(Job).options(joinedload(Job.employer)).all()
+        jobs = session.query(Job).all()
         session.close()
         return jobs
-        #return SessionLocal().query(Job).all()
     
     @staticmethod
     def resolve_employers(root, info):
         session = SessionLocal()
-        # employers = session.query(Employer).all()
-        employers = session.query(Employer).options(joinedload(Employer.jobs)).all()
+        employers = session.query(Employer).all()
+        # employers = session.query(Employer).options(joinedload(Employer.jobs)).all()
         session.close()
         return employers
-        #return SessionLocal().query(Employer).all() 
