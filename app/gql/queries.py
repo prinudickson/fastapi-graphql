@@ -9,6 +9,7 @@ class Query(ObjectType):
     jobs = List(JobObject)
     employers = List(EmployerObject)
     job = Field(JobObject, id=Int())
+    employer = Field(EmployerObject, id=Int())
 
     @staticmethod
     def resolve_jobs(root, info):
@@ -33,4 +34,10 @@ class Query(ObjectType):
         session.close()
         return jb
 
+    @staticmethod
+    def resolve_employer(root, info, id: int):
+        session = SessionLocal()
+        em = session.query(Employer).filter(Employer.id == id).first()
+        session.close()
+        return em
 
