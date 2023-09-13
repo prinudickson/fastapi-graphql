@@ -8,8 +8,8 @@ from sqlalchemy.orm import joinedload
 class Query(ObjectType):
     jobs = List(JobObject)
     employers = List(EmployerObject)
-    job = Field(JobObject, id=Int())
-    employer = Field(EmployerObject, id=Int())
+    job = Field(JobObject, id=Int(required=True))
+    employer = Field(EmployerObject, id=Int(required=True))
 
     @staticmethod
     def resolve_jobs(root, info):
