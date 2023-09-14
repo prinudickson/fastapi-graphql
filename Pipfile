@@ -12,6 +12,7 @@ uvicorn = "*"
 sqlalchemy = "*"
 psycopg = "*"
 psycopg2-binary = "*"
+argon2-cffi = "*"
 
 [dev-packages]
 
