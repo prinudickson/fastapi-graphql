@@ -3,3 +3,7 @@ DATABASE_PASSWORD = "admin"
 DATABASE_HOST = "localhost"
 DATABASE_PORT = "5432"
 DATABASE_NAME = "fastapi_graphene"
+
+SECRET_KEY = "graph_learning_123!"
+ALGORITHM = "HS256"
+TOKEN_EXPIRATION_TIME_MINUTES = 15

@@ -1,6 +1,10 @@
 from app.db.database import Base
 from app.db.models import Employer, Job, User, JobApplication
 
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()
+
 employers_data = [
     {"name": "MetaTechA", "contact_email": "contact@company-a.com", "industry": "Tech"},
     {"name": "MoneySoftB", "contact_email": "contact@company-b.com", "industry": "Finance"},
@@ -40,6 +44,8 @@ def prepare_database(Session, engine):
         session.add(jb)  
 
     for user in users_data:
+        user['password_hash'] = ph.hash(user['password'])
+        del user['password']
         u = User(**user)
         session.add(u)
 
