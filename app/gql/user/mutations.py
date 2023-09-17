@@ -2,12 +2,15 @@
 
 from graphene import Mutation, String, Field, Int, Boolean
 from graphql import GraphQLError
-from app.gql.types import UserObject
+
+from app.gql.types import UserObject, JobApplicationObject
 from app.db.database import SessionLocal
-from app.db.models import User
+from app.db.models import User, JobApplication
 from app.auth.token import generate_token
 from app.auth.hash import decrypt_password, hash_password
-from app.auth.auth import get_authenticated_user
+from app.auth.auth import get_authenticated_user, auth_user, auth_user_sameas
+from app.auth.admin import admin_user
+
 
 class LoginUser(Mutation):
     class Arguments:
@@ -44,14 +47,15 @@ class AddUser(Mutation):
 
     authenticated_as = Field(String)
 
+    @admin_user
     @staticmethod
     def mutate(root, info, username, password, email, role):
         loginuser = get_authenticated_user(info.context)
-        if role =="admin":
-            if loginuser.role =="admin":
-                pass
-            else:
-                raise GraphQLError("Only admins are allowed to register admins!")
+        # if role =="admin":
+        #     if loginuser.role =="admin":
+        #         pass
+        #     else:
+        #         raise GraphQLError("Only admins are allowed to register admins!")
 
         session = SessionLocal()
         password_hash = hash_password(password)
@@ -68,4 +72,33 @@ class AddUser(Mutation):
         session.refresh(user)
 
         return AddUser(user=user, authenticated_as=loginuser.email)
+    
+
+class ApplyJob(Mutation):
+    class Arguments:
+        user_id = Int(required=True)
+        job_id = Int(required=True)
+
+    job_application = Field(lambda: JobApplicationObject) 
+
+    @auth_user_sameas
+    @staticmethod
+    def mutate(root, info, user_id, job_id):
+        session = SessionLocal()
+
+        job_application_check = session.query(JobApplication).filter(
+            JobApplication.user_id == user_id,
+            JobApplication.job_id == job_id
+            ).first()
+
+        print
+        if job_application_check:
+            raise GraphQLError("User has already applied for job!")
+        
+        job_application = JobApplication(user_id=user_id, job_id=job_id)
+        session.add(job_application)
+        session.commit()
+        session.refresh(job_application)
+
+        return ApplyJob(job_application=job_application)
     

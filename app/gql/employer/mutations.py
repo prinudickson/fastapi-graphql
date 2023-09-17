@@ -4,6 +4,7 @@ from app.gql.types import EmployerObject
 from app.db.database import SessionLocal
 from app.db.models import Employer
 from app.auth.auth import get_authenticated_user
+from app.auth.admin import admin_user
             
 
 class AddEmployer(Mutation):
@@ -16,17 +17,19 @@ class AddEmployer(Mutation):
 
     authenticated_as = Field(String)
 
+    @admin_user
     @staticmethod
     def mutate(root, info, name, contact_email, industry):
         session = SessionLocal()
-        user = get_authenticated_user(info.context)
+        #user = get_authenticated_user(info.context)
         employer = Employer(name=name, contact_email=contact_email, industry=industry)
         
         session.add(employer)
         session.commit()
         session.refresh(employer)
         #session.close()
-        return AddEmployer(employer=employer, authenticated_as=user.email)
+        return AddEmployer(employer=employer)
+        #authenticated_as=user.email)
     
 
 class UpdateEmployer(Mutation):
@@ -38,6 +41,7 @@ class UpdateEmployer(Mutation):
 
     employer = Field(lambda: EmployerObject)
 
+    @admin_user
     @staticmethod
     def mutate(root, info, id, name=None, contact_email=None, industry=None):
         session = SessionLocal()
@@ -66,6 +70,7 @@ class DeleteEmployer(Mutation):
 
     success = Boolean()
 
+    @admin_user
     @staticmethod
     def mutate(root, info, id): #title=None, description=None, employer_id=None):
         session = SessionLocal()
