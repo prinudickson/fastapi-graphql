@@ -1,4 +1,6 @@
 import jwt
+import os
+from dotenv import load_dotenv
 from functools import wraps
 from graphql import GraphQLError
 from datetime import datetime, timezone
@@ -6,7 +8,10 @@ from app.db.models import User
 from app.db.database import SessionLocal
 from app.settings.config import SECRET_KEY, ALGORITHM
 
+load_dotenv()
 
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM')
 
 def get_authenticated_user(context):
     request_object = context.get('request')

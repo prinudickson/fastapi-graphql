@@ -1,8 +1,13 @@
 import jwt
+import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
-from app.settings.config import TOKEN_EXPIRATION_TIME_MINUTES, SECRET_KEY, ALGORITHM
+load_dotenv()
 
+TOKEN_EXPIRATION_TIME_MINUTES = int(os.getenv('TOKEN_EXPIRATION_TIME_MINUTES'))
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM')
 
 def generate_token(email):
     expiration_time = datetime.utcnow() + timedelta(minutes=TOKEN_EXPIRATION_TIME_MINUTES)

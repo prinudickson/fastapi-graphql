@@ -1,9 +1,14 @@
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy import create_engine, Column, Integer, String as sqString, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-from app.settings.config import *
+#from app.settings.config import *
 
-DB_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+load_dotenv()
+
+DB_URL = f"postgresql://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
 engine = create_engine(DB_URL, pool_size=50, max_overflow=5, echo=True)
 conn = engine.connect()
 
